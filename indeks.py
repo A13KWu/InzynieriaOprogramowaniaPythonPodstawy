@@ -1,3 +1,5 @@
+import re
+
 """
 Zadanie 3 - Indeksowanie dokumentów
 
@@ -47,11 +49,33 @@ def index_documents(documents: list[str], queries: list[str]) -> list[list[int]]
     Returns:
         list[list[int]]: Lista wyników dla kolejnych zapytań.
     """
-    ### TUTAJ PODAJ ROZWIĄZANIE ZADANIA
+    word_counts_per_doc = []
 
-    ### return [[]] - powinno być zmienione i zwrócić prawdziwy wynik (zgodny z oczekiwaniami)
-    return [[]]
+    for doc in documents:
+        clean_doc = re.sub(r'[^\w\s]', '', doc).lower()
+        words = clean_doc.split()
+        word_counts = {}
+        for word in words:
+            if word in word_counts:
+                word_counts[word] += 1
+            else:
+                word_counts[word] = 1
+        word_counts_per_doc.append(word_counts)
 
+    results = []
+
+    for query in queries:
+        query = query.lower()
+        doc_scores = []
+        for index, word_counts in enumerate(word_counts_per_doc):
+            count = word_counts.get(query, 0)
+            if count > 0:
+                doc_scores.append((count, index))
+        doc_scores.sort(key=lambda x:(-x[0], -x[1]))
+        doc_indices = [index for count, index in doc_scores]
+        results.append(doc_indices)
+
+    return results
 
 # Przykładowe wywołanie:
 if __name__ == "__main__":
